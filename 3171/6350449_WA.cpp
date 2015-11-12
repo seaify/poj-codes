@@ -1,0 +1,89 @@
+#include<stdio.h>
+#include<algorithm>
+using namespace std;
+
+int N,M,E,flag,size;
+long long f[11000],result;
+
+struct node
+{
+	int x,y,cost;
+};
+node a[11000],q[11000],hh;
+
+int cmp(node a,node b)
+{
+	if(a.y!=b.y)
+	   return a.y<b.y;
+	return a.x<b.x;
+}
+
+int solve(int cur)
+{
+	int left=1,mid,right=size;
+
+	if(a[cur].x==M)
+	{
+		  f[cur]=a[cur].cost;
+		  return 1;
+	}
+
+	if(size==0||q[size].y+1<a[cur].x)
+		  return 0;
+
+	while(left<=right)
+	{
+		  mid=(left+right)/2;
+          if(q[mid].y+1>=a[cur].x)
+			  right=mid-1;
+		  else
+			  left=mid+1;
+	}
+
+	f[cur]=f[q[left].x]+a[cur].cost;
+	return 1;
+}
+
+void del(int cur)
+{
+	while(size>=0&&q[size].cost>=a[cur].cost)
+		  size--;
+        ++size;
+        q[size].x=cur;
+	q[size].y=a[cur].y;
+        //q[size].cost=a[cur].cost;
+}
+
+int main()
+{
+	int i;
+	while(EOF!=scanf("%d %d %d",&N,&M,&E))
+	{
+		 for(i=1;i<=N;i++)
+			 scanf("%d %d %d",&a[i].x,&a[i].y,&a[i].cost);
+
+		 sort(a+1,a+N+1,cmp);
+         size=0;
+         flag=1;
+
+		 for(i=1;i<=N&&flag;i++)
+		 {
+             flag=solve(i);
+			 //printf("%d %d %lld\n",i,flag,f[i]);
+			 del(i);
+		 }
+         
+		 result=-1;
+
+		 if(flag)
+		 {
+			 for(i=1;i<=N;i++)
+				 if(a[i].y==E&&(result<0||f[i]<result))
+						 result=f[i];
+		 }
+
+		 printf("%lld\n",result);
+
+	}
+	return 0;
+}
